@@ -11,13 +11,13 @@ services:
       - redis
       - rabbitmq
     environment:
-      APP_ENV: prod
-      APP_DEBUG: "0"
-      DATABASE_URL: mysql://stue:MonPass123@mariadb:3306/marketplace_b2b
+      APP_ENV: dev
+      APP_DEBUG: "1"
+      DATABASE_URL: "mysql://stue:stuellah@mariadb:3306/marketplace_b2b?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
       REDIS_URL: redis://redis:6379
       RABBITMQ_DSN: amqp://guest:guest@rabbitmq:5672
-    command: bash -c "mkdir -p /var/www/html/var/cache/prod/vich_uploader && chown -R www-data:www-data /var/www/html/var/cache && apache2-foreground"
-  
+    command: bash -c "mkdir -p /var/www/html/var/cache/dev/vich_uploader && chown -R www-data:www-data /var/www/html/var/cache && apache2-foreground"
+
   frontend:
     build: ./frontend
     container_name: mon_projet_frontend
@@ -34,11 +34,12 @@ services:
       - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mon_projet
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: marketplace_b2b
+      MYSQL_USER: stue
+      MYSQL_PASSWORD: MonPass123
     volumes:
       - mariadb_data:/var/lib/mysql
+
   redis:
     image: redis:7-alpine
     container_name: mon_projet_redis
@@ -55,11 +56,10 @@ services:
   adminer:
     image: adminer:latest
     container_name: mon_projet_adminer
-    restart: always
     ports:
       - "8080:8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: mariadb
+    depends_on:
+      - mariadb
 
 volumes:
   mariadb_data:
